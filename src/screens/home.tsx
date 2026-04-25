@@ -1,25 +1,45 @@
 import React from 'react';
 
 import { useNavigate } from 'react-router';
-import { Box, Text, useInput } from 'ink';
+import { Box, Text, useApp } from 'ink';
 import BigText from 'ink-big-text';
 import Gradient from 'ink-gradient';
+import { Select } from '@inkjs/ui';
 
 export default function Home() {
   const navigate = useNavigate();
 
-  useInput((input, key) => {
-    if (key.return) {
-      navigate('/about');
-    }
-  });
+  const { exit } = useApp();
 
   return (
     <Box margin={2} gap={1} flexDirection="column">
       <Gradient name="teen">
         <BigText text="nono" />
       </Gradient>
-      <Text>Home. Press Enter to go to About.</Text>
+      <Select
+        options={[
+          {
+            label: 'Play',
+            value: 'play',
+          },
+          {
+            label: 'About',
+            value: 'about',
+          },
+          {
+            label: 'Exit',
+            value: 'exit',
+          },
+        ]}
+        onChange={(newValue) => {
+          if (newValue === 'about') {
+            navigate('/about');
+          }
+          if (newValue === 'exit') {
+            exit();
+          }
+        }}
+      />
     </Box>
   );
 }
