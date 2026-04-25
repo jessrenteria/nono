@@ -27,7 +27,7 @@
 
     // Repo-specific config.
     "outDir": "${configDir}/dist",
-
+    "baseUrl": "./src",
     "paths": {
       "@/*": [
         "./src/*"
