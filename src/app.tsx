@@ -1,10 +1,19 @@
 import React from 'react';
-import { Newline, Text } from 'ink';
+import { MemoryRouter, Routes, Route } from 'react-router';
+import { render } from 'ink';
 
-import NonoTitleText from '@/components/nono-title-text';
+import Home from '@/screens/home';
+import About from '@/screens/about';
 
 export default function App() {
   return (
-    <NonoTitleText />
+    <MemoryRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </MemoryRouter>
   );
 }
+
+render(<App />);

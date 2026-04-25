@@ -27,7 +27,6 @@ export default function NonoTitleText() {
       <Text color="#4B9FE3">
         ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝
       </Text>
-      <Newline />
     </Text>
   );
 }
