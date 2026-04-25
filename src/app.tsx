@@ -1,35 +1,10 @@
 import React from 'react';
 import { Newline, Text } from 'ink';
 
-type Props = {};
+import NonoTitleText from '@/components/nono-title-text';
 
-export default function App({ }: Props) {
+export default function App() {
   return (
-    <Text>
-      <Text color="#E34B74">
-        ███╗   ██╗ ██████╗ ███╗   ██╗ ██████╗
-      </Text>
-      <Newline />
-      <Text color="#E34BB3">
-        ████╗  ██║██╔═══██╗████╗  ██║██╔═══██╗
-      </Text>
-      <Newline />
-      <Text color="#924BE3">
-        ██╔██╗ ██║██║   ██║██╔██╗ ██║██║   ██║
-      </Text>
-      <Newline />
-      <Text color="#5F4BE3">
-        ██║╚██╗██║██║   ██║██║╚██╗██║██║   ██║
-      </Text>
-      <Newline />
-      <Text color="#4B71E3">
-        ██║ ╚████║╚██████╔╝██║ ╚████║╚██████╔╝
-      </Text>
-      <Newline />
-      <Text color="#4B9FE3">
-        ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝
-      </Text>
-      <Newline />
-    </Text>
+    <NonoTitleText />
   );
 }
