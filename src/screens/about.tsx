@@ -13,10 +13,10 @@ export default function() {
   });
 
   return (
-    <Box margin={2} gap={1} flexDirection={"column"}>
+    <Box margin={2} gap={1} flexDirection="column">
       <Text>Developed by @jessrenteria.</Text>
       <Text>Because there can never be enough Picross.</Text>
-      <Text>https://github.com/jessrenteria/nono</Text>
+      <Text>Repo: https://github.com/jessrenteria/nono</Text>
       <Text>Press Enter to go back Home.</Text>
     </Box >
   );
