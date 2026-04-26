@@ -69,6 +69,19 @@ export default function Puzzle({ model }: Props) {
       }
     };
 
+    const createDataRow = (left: string, inners: CellState[], junction: string,
+      junction5: string, right: string) => {
+      let id = 0;
+      let row = [<Text key={id++}>{left}</Text >];
+      for (let i = 0; i < inners.length; ++i) {
+        row.push(<Text key={id++}>{formatCellState(inners[i]!)}</Text>);
+        if (i === inners.length - 1) continue;
+        row.push(<Text key={id++}>{(i + 1) % 5 === 0 ? junction5 : junction}</Text>);
+      }
+      row.push(<Text key={id++}>{right}</Text>);
+      return <Text>{row}</Text>;
+    }
+
     const createRow = (left: string, inners: string[], junction: string,
       junction5: string, right: string) => {
       let row = [left];
@@ -90,8 +103,7 @@ export default function Puzzle({ model }: Props) {
     let textRows = [];
     textRows.push(createNonDataRow('┏', '━━', '┯', '┳', '┓'));
     for (let i = 0; i < numRows; ++i) {
-      textRows.push(createRow(
-        '┃', model.board[i]!.map(formatCellState), '│', '┃', '┃'));
+      textRows.push(createDataRow('┃', model.board[i]!, '│', '┃', '┃'));
       if (i === numRows - 1) continue;
       if ((i + 1) % 5 === 0) {
         textRows.push(createNonDataRow('┣', '━━', '┿', '╋', '┫'));
@@ -103,7 +115,7 @@ export default function Puzzle({ model }: Props) {
 
     return (
       <Box flexDirection="column">
-        <Text>{textRows.join('\n')}</Text>
+        {textRows.map((row, index) => <Text key={index}>{row}</Text>)}
       </Box>
     );
   }
