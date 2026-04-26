@@ -1,8 +1,15 @@
-import { type Puzzle } from '@/model';
+import { type CellState, type Model, type Puzzle } from '@/model';
+
+export function genModel(rows: number, columns: number): Model {
+  return {
+    puzzle: genPuzzle(rows, columns),
+    board: getEmptyBoard(rows, columns),
+    focus: { row: 0, column: 0 },
+  };
+}
 
 export function genPuzzle(rows: number, columns: number): Puzzle {
   const solution = genSolution(rows, columns);
-
   return {
     solution: solution,
     numRows: rows,
@@ -76,4 +83,8 @@ function getColumnConstraints(solution: boolean[][]): number[][] {
   // TODO: Consider avoiding the transpose while minimizing code duplication
   // by using generators instead of arrays.
   return transposeMatrix(solution).map(getConstraints);
+}
+
+function getEmptyBoard(rows: number, columns: number): CellState[][] {
+  return Array.from({ length: rows }, () => Array(columns).fill('empty'));
 }
