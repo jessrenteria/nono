@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { Box, Text, useApp } from 'ink';
 import BigText from 'ink-big-text';
 import Gradient from 'ink-gradient';
-import { Select } from '@inkjs/ui';
+import SelectInput from 'ink-select-input';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -16,8 +16,8 @@ export default function Home() {
       <Gradient name="teen">
         <BigText text="nono" />
       </Gradient>
-      <Select
-        options={[
+      <SelectInput
+        items={[
           {
             label: 'Play',
             value: 'play',
@@ -31,14 +31,14 @@ export default function Home() {
             value: 'exit',
           },
         ]}
-        onChange={(newValue) => {
-          if (newValue === 'play') {
+        onSelect={({ label, value }) => {
+          if (value === 'play') {
             navigate('/puzzle');
           }
-          if (newValue === 'about') {
+          if (value === 'about') {
             navigate('/about');
           }
-          if (newValue === 'exit') {
+          if (value === 'exit') {
             exit();
           }
         }}
