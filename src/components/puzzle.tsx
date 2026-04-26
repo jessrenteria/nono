@@ -17,6 +17,10 @@ export default function Puzzle({ initModel }: Props) {
   const navigate = useNavigate();
   const [model, updateModel] = useImmer<Model>(initModel);
 
+  const getFocusState = () => {
+    return model.board[model.focus.row]![model.focus.column]!;
+  };
+
   useInput((input, key) => {
     const wrappedIncrement = (current: number, length: number) => {
       return (current + 1) % length;
@@ -50,6 +54,38 @@ export default function Puzzle({ initModel }: Props) {
           wrappedIncrement(model.focus.column, model.puzzle.numColumns);
       });
     }
+
+    // Fill.
+    if (input === 'f') {
+      updateModel((model) => {
+        const currentState = getFocusState();
+        if (currentState === 'filled') {
+          model.board[model.focus.row]![model.focus.column]! = 'empty';
+          return;
+        }
+        model.board[model.focus.row]![model.focus.column]! = 'filled';
+      });
+    }
+
+    // Cross.
+    if (input === 's') {
+      updateModel((model) => {
+        const currentState = getFocusState();
+        if (currentState === 'crossed') {
+          model.board[model.focus.row]![model.focus.column]! = 'empty';
+          return;
+        }
+        model.board[model.focus.row]![model.focus.column]! = 'crossed';
+      });
+    }
+
+    // Clear.
+    if (input === 'd') {
+      updateModel((model) => {
+        model.board[model.focus.row]![model.focus.column]! = 'empty';
+      });
+    }
+
     if (key.return) {
       navigate('/');
     }
