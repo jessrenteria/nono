@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
 
-import { type Model } from '@/model';
+import { type CellState, type Model } from '@/model';
 
 type Props = {
   model?: Model;
@@ -61,22 +61,45 @@ export default function Puzzle({ model }: Props) {
     const numRows = model.puzzle.numRows;
     const numColumns = model.puzzle.numColumns;
 
-    const createRow = (left: string, inner: string, junction: string,
-      right: string) => {
-      return [left, Array(numColumns).fill(inner).join(junction), right]
-        .join('');
+    const formatCellState = (state: CellState) => {
+      switch (state) {
+        case 'empty': return '  ';
+        case 'crossed': return '❭❬';
+        case 'filled': return '██';
+      }
+    };
+
+    const createRow = (left: string, inners: string[], junction: string,
+      junction5: string, right: string) => {
+      let row = [left];
+      for (let i = 0; i < inners.length; ++i) {
+        row.push(inners[i]!);
+        if (i === inners.length - 1) continue;
+        row.push((i + 1) % 5 === 0 ? junction5 : junction);
+      }
+      row.push(right);
+      return row.join('');
+    }
+
+    const createNonDataRow = (left: string, inner: string, junction: string,
+      junction5: string, right: string) => {
+      return createRow(left, Array(numColumns).fill(inner), junction, junction5,
+        right);
     }
 
     let textRows = [];
-    textRows.push(createRow('┏', '━━', '┯', '┓'));
+    textRows.push(createNonDataRow('┏', '━━', '┯', '┳', '┓'));
     for (let i = 0; i < numRows; ++i) {
-      // TODO: Incorporate CellState.
-      textRows.push(createRow('┃', '  ', '│', '┃'));
-      if (i !== numRows - 1) {
-        textRows.push(createRow('┠', '──', '┼', '┨'));
+      textRows.push(createRow(
+        '┃', model.board[i]!.map(formatCellState), '│', '┃', '┃'));
+      if (i === numRows - 1) continue;
+      if ((i + 1) % 5 === 0) {
+        textRows.push(createNonDataRow('┣', '━━', '┿', '╋', '┫'));
+      } else {
+        textRows.push(createNonDataRow('┠', '──', '┼', '╂', '┨'));
       }
     }
-    textRows.push(createRow('┗', '━━', '┷', '┛'));
+    textRows.push(createNonDataRow('┗', '━━', '┷', '┻', '┛'));
 
     return (
       <Box flexDirection="column">
@@ -105,7 +128,13 @@ export default function Puzzle({ model }: Props) {
       rowConstraints: [[1, 2, 3], [4, 5], [6], [7, 8], [9]],
       columnConstraints: [[1, 2, 3], [4, 5], [6], [7, 8], [9]],
     },
-    board: [],
+    board: [
+      ['filled', 'empty', 'empty', 'empty', 'crossed'],
+      ['empty', 'filled', 'empty', 'crossed', 'empty'],
+      ['empty', 'empty', 'filled', 'empty', 'empty'],
+      ['empty', 'crossed', 'empty', 'filled', 'empty'],
+      ['crossed', 'empty', 'empty', 'empty', 'filled'],
+    ] as CellState[][],
     focus: { row: 0, column: 0 },
   };
 
