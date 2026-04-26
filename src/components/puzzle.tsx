@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useNavigate } from 'react-router';
-import { Box, Text, useInput } from 'ink';
+import { Box, Spacer, Text, useInput } from 'ink';
 import { useImmer } from 'use-immer';
 
 import { type CellState, type Model } from '@/model';
@@ -68,7 +68,7 @@ export default function Puzzle({ initModel }: Props) {
     }
 
     // Cross.
-    if (input === 's') {
+    if (input === 'c') {
       updateModel((model) => {
         const currentState = getFocusState();
         if (currentState === 'crossed') {
@@ -80,7 +80,7 @@ export default function Puzzle({ initModel }: Props) {
     }
 
     // Clear.
-    if (input === 'd') {
+    if (input === 's') {
       updateModel((model) => {
         model.board[model.focus.row]![model.focus.column]! = 'empty';
       });
@@ -225,6 +225,16 @@ export default function Puzzle({ initModel }: Props) {
     return <Box width={width} height={height} />
   }
 
+  const InfoSection = () => {
+    return (
+      <Box borderStyle='round'>
+        <Text>{model.puzzle.numRows} x {model.puzzle.numColumns}</Text>
+        <Spacer />
+        <Text>&lt;F&gt; to fill, &lt;C&gt; to cross, &lt;S&gt; to clear.</Text>
+      </Box>
+    );
+  }
+
   return (
     <Box flexDirection="column">
       <Box>
@@ -235,6 +245,7 @@ export default function Puzzle({ initModel }: Props) {
         {RowConstraintSection()}
         {BoardSection()}
       </Box>
+      {InfoSection()}
     </Box>
   );
 }
