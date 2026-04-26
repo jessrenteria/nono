@@ -24,6 +24,6 @@ export default function Game() {
   };
 
   return (
-    <Puzzle model={mockModel} />
+    <Puzzle initModel={mockModel} />
   );
 }

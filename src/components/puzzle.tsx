@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useNavigate } from 'react-router';
 import { Box, Text, useInput } from 'ink';
+import { useImmer } from 'use-immer';
 
 import { type CellState, type Model } from '@/model';
 
@@ -9,13 +10,46 @@ const focusTextColor = '#e486ae';
 const focusBgColor = '#77a3d3';
 
 type Props = {
-  model: Model;
+  initModel: Model;
 };
 
-export default function Puzzle({ model }: Props) {
+export default function Puzzle({ initModel }: Props) {
   const navigate = useNavigate();
+  const [model, updateModel] = useImmer<Model>(initModel);
 
   useInput((input, key) => {
+    const wrappedIncrement = (current: number, length: number) => {
+      return (current + 1) % length;
+    };
+
+    const wrappedDecrement = (current: number, length: number) => {
+      return (current + length - 1) % length;
+    };
+
+    if (key.leftArrow || input === 'h') {
+      updateModel((model) => {
+        model.focus.column =
+          wrappedDecrement(model.focus.column, model.puzzle.numColumns);
+      });
+    }
+    if (key.downArrow || input === 'j') {
+      updateModel((model) => {
+        model.focus.row =
+          wrappedIncrement(model.focus.row, model.puzzle.numRows);
+      });
+    }
+    if (key.upArrow || input === 'k') {
+      updateModel((model) => {
+        model.focus.row =
+          wrappedDecrement(model.focus.row, model.puzzle.numRows);
+      });
+    }
+    if (key.rightArrow || input === 'l') {
+      updateModel((model) => {
+        model.focus.column =
+          wrappedIncrement(model.focus.column, model.puzzle.numColumns);
+      });
+    }
     if (key.return) {
       navigate('/');
     }
