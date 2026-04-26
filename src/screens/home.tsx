@@ -32,6 +32,9 @@ export default function Home() {
           },
         ]}
         onChange={(newValue) => {
+          if (newValue === 'play') {
+            navigate('/puzzle');
+          }
           if (newValue === 'about') {
             navigate('/about');
           }

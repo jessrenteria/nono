@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { Box, Newline, Text, useInput } from 'ink';
 
-export default function() {
+export default function About() {
   const navigate = useNavigate();
 
   useInput((input, key) => {
@@ -21,6 +21,6 @@ export default function() {
       </Text>
       <Text>Repo: https://github.com/jessrenteria/nono</Text>
       <Text>Press Enter to return.</Text>
-    </Box >
+    </Box>
   );
 }
