@@ -5,8 +5,11 @@ import { Box, Text, useInput } from 'ink';
 
 import { type CellState, type Model } from '@/model';
 
+const focusTextColor = '#e486ae';
+const focusBgColor = '#77a3d3';
+
 type Props = {
-  model?: Model;
+  model: Model;
 };
 
 export default function Puzzle({ model }: Props) {
@@ -18,92 +21,112 @@ export default function Puzzle({ model }: Props) {
     }
   });
 
-  const ColumnConstraints = (constraints: number[], index: number) => {
+  const ColumnConstraints = (constraints: number[], column: number) => {
+    const isFocused = column === model.focus.column;
     return (
-      <Box width={3} flexDirection="column" alignItems="flex-end" key={index}>
+      <Box width={3} flexDirection="column" alignItems="flex-end" key={column}>
         {constraints.map(
-          (constraint, index) => <Text key={index}>{constraint}</Text>)}
+          (constraint, index) =>
+            <Text
+              key={index}
+              color={isFocused ? focusTextColor : ''}
+              bold={isFocused}>
+              {constraint}
+            </Text>)}
       </Box>
     );
   };
 
-  const ColumnConstraintSection = (constraints: number[][]) => {
+  const ColumnConstraintSection = () => {
     return (
       <Box flexDirection="row" alignItems="flex-end">
-        {constraints.map(ColumnConstraints)}
+        {model.puzzle.columnConstraints.map(ColumnConstraints)}
       </Box>
     );
   };
 
-  const RowConstraints = (constraints: number[], index: number) => {
+  const RowConstraints = (constraints: number[], row: number) => {
+    const isFocused = row === model.focus.row;
     return (
       <Box
         height={2}
         gap={1}
         flexDirection="row"
         alignItems="flex-end"
-        key={index}>
+        key={row}>
         {constraints.map(
-          (constraint, index) => <Text key={index}>{constraint}</Text>)}
+          (constraint, index) =>
+            <Text
+              key={index}
+              color={isFocused ? focusTextColor : ''}
+              bold={isFocused}>
+              {constraint}
+            </Text>)}
       </Box>
     );
   };
 
-  const RowConstraintSection = (constraints: number[][]) => {
+  const RowConstraintSection = () => {
     return (
       <Box flexDirection="column" alignItems="flex-end">
-        {constraints.map(RowConstraints)}
+        {model.puzzle.rowConstraints.map(RowConstraints)}
       </Box>
     );
   };
 
-  const BoardSection = (model: Model) => {
+  const BoardSection = () => {
     const numRows = model.puzzle.numRows;
     const numColumns = model.puzzle.numColumns;
 
     const formatCellState = (state: CellState) => {
       switch (state) {
         case 'empty': return '  ';
-        case 'crossed': return '❭❬';
+        case 'crossed': return '╳╳';
         case 'filled': return '██';
       }
     };
 
-    const createDataRow = (left: string, inners: CellState[], junction: string,
+    const createDataRow = (left: string, rowIndex: number, junction: string,
       junction5: string, right: string) => {
+      const states = model.board[rowIndex]!;
       let id = 0;
-      let row = [<Text key={id++}>{left}</Text >];
-      for (let i = 0; i < inners.length; ++i) {
-        row.push(<Text key={id++}>{formatCellState(inners[i]!)}</Text>);
-        if (i === inners.length - 1) continue;
-        row.push(<Text key={id++}>{(i + 1) % 5 === 0 ? junction5 : junction}</Text>);
+      let row = [<Text key={id++}>{left}</Text>];
+      for (let c = 0; c < states.length; ++c) {
+        let isFocused = rowIndex === model.focus.row
+          && c === model.focus.column;
+        let backgroundColor = (isFocused && states[c]! == 'empty')
+          ? focusBgColor : '';
+        row.push(
+          <Text
+            key={id++}
+            backgroundColor={backgroundColor}
+            color={isFocused ? focusTextColor : ''}>
+            {formatCellState(states[c]!)}
+          </Text>);
+        if (c === states.length - 1) continue;
+        row.push(
+          <Text key={id++}>{(c + 1) % 5 === 0 ? junction5 : junction}</Text>);
       }
       row.push(<Text key={id++}>{right}</Text>);
       return <Text>{row}</Text>;
     }
 
-    const createRow = (left: string, inners: string[], junction: string,
+    const createNonDataRow = (left: string, inner: string, junction: string,
       junction5: string, right: string) => {
       let row = [left];
-      for (let i = 0; i < inners.length; ++i) {
-        row.push(inners[i]!);
-        if (i === inners.length - 1) continue;
+      for (let i = 0; i < numColumns; ++i) {
+        row.push(inner);
+        if (i === numColumns - 1) continue;
         row.push((i + 1) % 5 === 0 ? junction5 : junction);
       }
       row.push(right);
       return row.join('');
     }
 
-    const createNonDataRow = (left: string, inner: string, junction: string,
-      junction5: string, right: string) => {
-      return createRow(left, Array(numColumns).fill(inner), junction, junction5,
-        right);
-    }
-
     let textRows = [];
     textRows.push(createNonDataRow('┏', '━━', '┯', '┳', '┓'));
     for (let i = 0; i < numRows; ++i) {
-      textRows.push(createDataRow('┃', model.board[i]!, '│', '┃', '┃'));
+      textRows.push(createDataRow('┃', i, '│', '┃', '┃'));
       if (i === numRows - 1) continue;
       if ((i + 1) % 5 === 0) {
         textRows.push(createNonDataRow('┣', '━━', '┿', '╋', '┫'));
@@ -120,7 +143,7 @@ export default function Puzzle({ model }: Props) {
     );
   }
 
-  const SpacerSection = (model: Model) => {
+  const SpacerSection = () => {
     const rowConstraints = model.puzzle.rowConstraints;
     const columnConstraints = model.puzzle.columnConstraints;
 
@@ -132,33 +155,15 @@ export default function Puzzle({ model }: Props) {
     return <Box width={width} height={height} />
   }
 
-  let mockModel = {
-    puzzle: {
-      solution: [],
-      numRows: 5,
-      numColumns: 5,
-      rowConstraints: [[1, 2, 3], [4, 5], [6], [7, 8], [9]],
-      columnConstraints: [[1, 2, 3], [4, 5], [6], [7, 8], [9]],
-    },
-    board: [
-      ['filled', 'empty', 'empty', 'empty', 'crossed'],
-      ['empty', 'filled', 'empty', 'crossed', 'empty'],
-      ['empty', 'empty', 'filled', 'empty', 'empty'],
-      ['empty', 'crossed', 'empty', 'filled', 'empty'],
-      ['crossed', 'empty', 'empty', 'empty', 'filled'],
-    ] as CellState[][],
-    focus: { row: 0, column: 0 },
-  };
-
   return (
     <Box flexDirection="column">
       <Box>
-        {SpacerSection(mockModel)}
-        {ColumnConstraintSection(mockModel.puzzle.columnConstraints)}
+        {SpacerSection()}
+        {ColumnConstraintSection()}
       </Box>
       <Box>
-        {RowConstraintSection(mockModel.puzzle.rowConstraints)}
-        {BoardSection(mockModel)}
+        {RowConstraintSection()}
+        {BoardSection()}
       </Box>
     </Box>
   );
