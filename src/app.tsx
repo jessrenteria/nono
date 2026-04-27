@@ -1,6 +1,5 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import { render } from 'ink';
 
 import About from '@/screens/about';
 import Game from '@/screens/game';
