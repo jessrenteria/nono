@@ -46,9 +46,10 @@ type Model = {
 
 type Props = {
   puzzle: PuzzleData;
+  onNewPuzzle: () => void;
 };
 
-export default function PuzzleData({ puzzle }: Props) {
+export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   const navigate = useNavigate();
   const [model, updateModel] = useImmer<Model>(initModel(puzzle));
   const [solutionState, updateSolutionState] =
@@ -87,8 +88,10 @@ export default function PuzzleData({ puzzle }: Props) {
       return;
     }
 
-    // Short-circuit to prevent further input.
-    if (isSolved) return;
+    if (isSolved) {
+      if (input === 'n') onNewPuzzle();
+      return;
+    }
 
     const wrappedIncrement = (current: number, length: number) => {
       return (current + 1) % length;
@@ -337,6 +340,26 @@ export default function PuzzleData({ puzzle }: Props) {
     return <Box width={width} height={height} />
   }
 
+  const Controls = () => {
+    if (isSolved) {
+      return (
+        <>
+          <Text>&lt;N&gt; to refresh board</Text>
+          <Text>&lt;Enter&gt; for main menu</Text>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Text>&lt;F&gt; to fill</Text>
+        <Text>&lt;C&gt; to cross</Text>
+        <Text>&lt;S&gt; to clear</Text>
+        <Text>&lt;Enter&gt; for main menu</Text>
+      </>
+    );
+  }
+
   const InfoSection = () => {
     return (
       <Box gap={1} borderStyle='round'>
@@ -346,10 +369,7 @@ export default function PuzzleData({ puzzle }: Props) {
         <Spacer />
         {isSolved && <Gradient name="teen"><Text>C L E A R !</Text></Gradient>}
         <Spacer />
-        <Text>&lt;F&gt; to fill</Text>
-        <Text>&lt;C&gt; to cross</Text>
-        <Text>&lt;S&gt; to clear</Text>
-        <Text>&lt;Enter&gt; for main menu</Text>
+        {Controls()}
       </Box>
     );
   }
