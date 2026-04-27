@@ -4,18 +4,18 @@ import { useNavigate } from 'react-router';
 import { Box, Spacer, Text, useInput } from 'ink';
 import { useImmer } from 'use-immer';
 
-import { type CellState, type Model } from '@/model';
+import { type CellState, type Model, type Puzzle } from '@/model';
 
 const focusTextColor = '#e486ae';
 const focusBgColor = '#77a3d3';
 
 type Props = {
-  initModel: Model;
+  puzzle: Puzzle;
 };
 
-export default function Puzzle({ initModel }: Props) {
+export default function Puzzle({ puzzle }: Props) {
   const navigate = useNavigate();
-  const [model, updateModel] = useImmer<Model>(initModel);
+  const [model, updateModel] = useImmer<Model>(initModel(puzzle));
 
   const getFocusState = () => {
     return model.board[model.focus.row]![model.focus.column]!;
@@ -248,4 +248,16 @@ export default function Puzzle({ initModel }: Props) {
       {InfoSection()}
     </Box>
   );
+}
+
+function initModel(puzzle: Puzzle): Model {
+  return {
+    puzzle: puzzle,
+    board: getEmptyBoard(puzzle.numRows, puzzle.numColumns),
+    focus: { row: 0, column: 0 },
+  };
+}
+
+function getEmptyBoard(rows: number, columns: number): CellState[][] {
+  return Array.from({ length: rows }, () => Array(columns).fill('empty'));
 }

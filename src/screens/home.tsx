@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { useNavigate } from 'react-router';
 import { Box, Text, useApp } from 'ink';
 import BigText from 'ink-big-text';
 import Gradient from 'ink-gradient';
 import SelectInput from 'ink-select-input';
+import { useNavigate } from 'react-router';
 
 export default function Home() {
   const navigate = useNavigate();
