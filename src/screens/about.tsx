@@ -20,7 +20,7 @@ export default function About() {
         I mean...nonograms.
       </Text>
       <Text>Repo: https://github.com/jessrenteria/nono</Text>
-      <Text>Press Enter to return.</Text>
+      <Text>Press Enter to return to main menu.</Text>
     </Box>
   );
 }

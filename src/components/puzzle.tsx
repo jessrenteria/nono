@@ -2,12 +2,25 @@ import React from 'react';
 
 import { useNavigate } from 'react-router';
 import { Box, Spacer, Text, useInput } from 'ink';
+import Gradient from 'ink-gradient';
 import { useImmer } from 'use-immer';
 
 import { type CellState, type Model, type Puzzle } from '@/model';
 
 const focusTextColor = '#e486ae';
 const focusBgColor = '#77a3d3';
+
+// State for efficiently checking completion status.
+type SolutionState = {
+  // The total number of fills in the solution.
+  solutionFills: number,
+  // The number of true fills by the user (filled in the current board state and
+  // the solution).
+  trueFills: number,
+  // The number of false fills by the user (filled in the current board state
+  // but not the solution).
+  falseFills: number,
+};
 
 type Props = {
   puzzle: Puzzle;
@@ -16,12 +29,29 @@ type Props = {
 export default function Puzzle({ puzzle }: Props) {
   const navigate = useNavigate();
   const [model, updateModel] = useImmer<Model>(initModel(puzzle));
+  const [solutionState, updateSolutionState] =
+    useImmer<SolutionState>(initSolutionState(puzzle));
 
   const getFocusState = () => {
     return model.board[model.focus.row]![model.focus.column]!;
   };
 
+  const getFocusSolution = () => {
+    return model.puzzle.solution[model.focus.row]![model.focus.column]!;
+  };
+
+  const isSolved = solutionState.falseFills === 0 &&
+    solutionState.trueFills === solutionState.solutionFills;
+
   useInput((input, key) => {
+    if (key.return) {
+      navigate('/');
+      return;
+    }
+
+    // Short-circuit to prevent further input.
+    if (isSolved) return;
+
     const wrappedIncrement = (current: number, length: number) => {
       return (current + 1) % length;
     };
@@ -35,24 +65,28 @@ export default function Puzzle({ puzzle }: Props) {
         model.focus.column =
           wrappedDecrement(model.focus.column, model.puzzle.numColumns);
       });
+      return;
     }
     if (key.downArrow || input === 'j') {
       updateModel((model) => {
         model.focus.row =
           wrappedIncrement(model.focus.row, model.puzzle.numRows);
       });
+      return;
     }
     if (key.upArrow || input === 'k') {
       updateModel((model) => {
         model.focus.row =
           wrappedDecrement(model.focus.row, model.puzzle.numRows);
       });
+      return;
     }
     if (key.rightArrow || input === 'l') {
       updateModel((model) => {
         model.focus.column =
           wrappedIncrement(model.focus.column, model.puzzle.numColumns);
       });
+      return;
     }
 
     // Fill.
@@ -61,10 +95,29 @@ export default function Puzzle({ puzzle }: Props) {
         const currentState = getFocusState();
         if (currentState === 'filled') {
           model.board[model.focus.row]![model.focus.column]! = 'empty';
+          if (getFocusSolution()) {
+            updateSolutionState((solutionState) => {
+              --solutionState.trueFills;
+            });
+          } else {
+            updateSolutionState((solutionState) => {
+              --solutionState.falseFills;
+            });
+          }
           return;
         }
         model.board[model.focus.row]![model.focus.column]! = 'filled';
+        if (getFocusSolution()) {
+          updateSolutionState((solutionState) => {
+            ++solutionState.trueFills;
+          });
+        } else {
+          updateSolutionState((solutionState) => {
+            ++solutionState.falseFills;
+          });
+        }
       });
+      return;
     }
 
     // Cross.
@@ -76,31 +129,52 @@ export default function Puzzle({ puzzle }: Props) {
           return;
         }
         model.board[model.focus.row]![model.focus.column]! = 'crossed';
+        if (currentState === 'filled') {
+          if (getFocusSolution()) {
+            updateSolutionState((solutionState) => {
+              --solutionState.trueFills;
+            });
+          } else {
+            updateSolutionState((solutionState) => {
+              --solutionState.falseFills;
+            });
+          }
+        }
       });
+      return;
     }
 
     // Clear.
     if (input === 's') {
       updateModel((model) => {
         model.board[model.focus.row]![model.focus.column]! = 'empty';
+        const currentState = getFocusState();
+        if (currentState === 'filled') {
+          if (getFocusSolution()) {
+            updateSolutionState((solutionState) => {
+              --solutionState.trueFills;
+            });
+          } else {
+            updateSolutionState((solutionState) => {
+              --solutionState.falseFills;
+            });
+          }
+        }
       });
-    }
-
-    if (key.return) {
-      navigate('/');
+      return;
     }
   });
 
   const ColumnConstraints = (constraints: number[], column: number) => {
-    const isFocused = column === model.focus.column;
+    const shouldHighlight = !isSolved && column === model.focus.column;
     return (
       <Box width={3} flexDirection="column" alignItems="flex-end" key={column}>
         {constraints.map(
           (constraint, index) =>
             <Text
               key={index}
-              color={isFocused ? focusTextColor : ''}
-              bold={isFocused}>
+              color={shouldHighlight ? focusTextColor : undefined}
+              bold={shouldHighlight}>
               {constraint}
             </Text>)}
       </Box>
@@ -116,7 +190,7 @@ export default function Puzzle({ puzzle }: Props) {
   };
 
   const RowConstraints = (constraints: number[], row: number) => {
-    const isFocused = row === model.focus.row;
+    const shouldHighlight = !isSolved && row === model.focus.row;
     return (
       <Box
         height={2}
@@ -128,8 +202,8 @@ export default function Puzzle({ puzzle }: Props) {
           (constraint, index) =>
             <Text
               key={index}
-              color={isFocused ? focusTextColor : ''}
-              bold={isFocused}>
+              color={shouldHighlight ? focusTextColor : undefined}
+              bold={shouldHighlight}>
               {constraint}
             </Text>)}
       </Box>
@@ -162,15 +236,15 @@ export default function Puzzle({ puzzle }: Props) {
       let id = 0;
       let row = [<Text key={id++}>{left}</Text>];
       for (let c = 0; c < states.length; ++c) {
-        let isFocused = rowIndex === model.focus.row
+        let shouldHighlight = !isSolved && rowIndex === model.focus.row
           && c === model.focus.column;
-        let backgroundColor = (isFocused && states[c]! == 'empty')
+        let backgroundColor = (shouldHighlight && states[c]! == 'empty')
           ? focusBgColor : '';
         row.push(
           <Text
             key={id++}
             backgroundColor={backgroundColor}
-            color={isFocused ? focusTextColor : ''}>
+            color={shouldHighlight ? focusTextColor : undefined}>
             {formatCellState(states[c]!)}
           </Text>);
         if (c === states.length - 1) continue;
@@ -227,12 +301,14 @@ export default function Puzzle({ puzzle }: Props) {
 
   const InfoSection = () => {
     return (
-      <Box borderStyle='round'>
-        <Text>
-          {model.puzzle.numRows} x {model.puzzle.numColumns} ({model.puzzle.type})
-        </Text>
+      <Box gap={1} borderStyle='round'>
+        <Text>{model.puzzle.numRows} x {model.puzzle.numColumns}</Text>
+        <Text>({model.puzzle.type})</Text>
         <Spacer />
-        <Text>&lt;F&gt; to fill, &lt;C&gt; to cross, &lt;S&gt; to clear.</Text>
+        {isSolved && <Gradient name="teen"><Text>C L E A R !</Text></Gradient>}
+        <Spacer />
+        <Text>&lt;F&gt; to fill, &lt;C&gt; to cross, &lt;S&gt; to clear,</Text>
+        <Text>&lt;Enter&gt; for main menu</Text>
       </Box>
     );
   }
@@ -250,6 +326,21 @@ export default function Puzzle({ puzzle }: Props) {
       {InfoSection()}
     </Box>
   );
+}
+
+function countFills(solution: boolean[][]) {
+  return solution.reduce(
+    (acc, row) =>
+      acc + row.reduce((acc, cell) => acc + (cell ? 1 : 0), 0),
+    0);
+}
+
+function initSolutionState(puzzle: Puzzle) {
+  return {
+    solutionFills: countFills(puzzle.solution),
+    trueFills: 0,
+    falseFills: 0,
+  };
 }
 
 function initModel(puzzle: Puzzle): Model {
