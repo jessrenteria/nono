@@ -15,7 +15,7 @@ export default function Home() {
         <BigText text="nono" />
       </Gradient>
       {hasSelectedPlay
-        ? <PlayMenu />
+        ? <PlayMenu onSelectedBack={() => setHasSelectedPlay(false)} />
         : <MainMenu onSelectedPlay={() => setHasSelectedPlay(true)} />}
     </Box>
   );
@@ -62,7 +62,11 @@ function MainMenu({ onSelectedPlay }: MainMenuProps) {
   );
 }
 
-function PlayMenu() {
+type PlayMenuProps = {
+  onSelectedBack: () => void;
+};
+
+function PlayMenu({ onSelectedBack }: PlayMenuProps) {
   const navigate = useNavigate();
 
   return (
@@ -97,7 +101,7 @@ function PlayMenu() {
             navigate('/puzzle/random/20/20');
             break;
           case 'back':
-            navigate('/');
+            onSelectedBack();
             break;
         }
       }}
