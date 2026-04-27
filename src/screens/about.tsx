@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useNavigate } from 'react-router';
-import { Box, Newline, Text, useInput } from 'ink';
+import { Box, Text, useInput } from 'ink';
 
 export default function About() {
   const navigate = useNavigate();

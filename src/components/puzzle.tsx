@@ -6,7 +6,7 @@ import { useImmer } from 'use-immer';
 import { useNavigate } from 'react-router';
 import { useStopwatch } from 'react-timer-hook';
 
-import { type CellState, type Model, type Puzzle } from '@/model';
+import { type PuzzleData } from '@/puzzle-data';
 
 const focusTextColor = '#e486ae';
 const focusBgColor = '#77a3d3';
@@ -23,11 +23,32 @@ type SolutionState = {
   falseFills: number,
 };
 
-type Props = {
-  puzzle: Puzzle;
+type CellState =
+  | 'empty'
+  | 'crossed'
+  | 'filled';
+
+// The top left corner is (0, 0).
+type Point = {
+  row: number;
+  column: number;
 };
 
-export default function Puzzle({ puzzle }: Props) {
+// Model for an m x n nonogram puzzle.
+type Model = {
+  // An m x n nonogram puzzle.
+  puzzle: PuzzleData;
+  // An m x n tensor of the current cell states.
+  board: CellState[][];
+  // Focused cell.
+  focus: Point;
+};
+
+type Props = {
+  puzzle: PuzzleData;
+};
+
+export default function PuzzleData({ puzzle }: Props) {
   const navigate = useNavigate();
   const [model, updateModel] = useImmer<Model>(initModel(puzzle));
   const [solutionState, updateSolutionState] =
@@ -358,7 +379,7 @@ function countFills(solution: boolean[][]) {
     0);
 }
 
-function initSolutionState(puzzle: Puzzle) {
+function initSolutionState(puzzle: PuzzleData) {
   return {
     solutionFills: countFills(puzzle.solution),
     trueFills: 0,
@@ -366,7 +387,7 @@ function initSolutionState(puzzle: Puzzle) {
   };
 }
 
-function initModel(puzzle: Puzzle): Model {
+function initModel(puzzle: PuzzleData): Model {
   return {
     puzzle: puzzle,
     board: getEmptyBoard(puzzle.numRows, puzzle.numColumns),

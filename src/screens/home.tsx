@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Box, Text, useApp } from 'ink';
+import { Box, useApp } from 'ink';
 import BigText from 'ink-big-text';
 import Gradient from 'ink-gradient';
 import SelectInput from 'ink-select-input';

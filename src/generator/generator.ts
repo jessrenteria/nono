@@ -1,6 +1,6 @@
-import { type CellState, type Model, type Puzzle } from '@/model';
+import { type PuzzleData } from '@/puzzle-data';
 
-export function genPuzzle(rows: number, columns: number): Puzzle {
+export function genPuzzle(rows: number, columns: number): PuzzleData {
   const solution = genSolution(rows, columns);
   return {
     solution: solution,

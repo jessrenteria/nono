@@ -1,5 +1,5 @@
 // An m x n nonogram puzzle (rows x columns). The top left corner is (0, 0).
-export type Puzzle = {
+export type PuzzleData = {
   // m rows of n columns. False -> empty, true -> filled.
   solution: boolean[][];
 
@@ -20,26 +20,4 @@ export type Puzzle = {
 
   // Type of puzzle, or more specifically, how it was created.
   type: 'random';
-};
-
-// State of an individual cell.
-export type CellState =
-  | 'empty'
-  | 'crossed'
-  | 'filled';
-
-// The top left corner is (0, 0).
-export type Point = {
-  row: number;
-  column: number;
-};
-
-// Model for an m x n nonogram puzzle.
-export type Model = {
-  // An m x n nonogram puzzle.
-  puzzle: Puzzle;
-  // An m x n tensor of the current cell states.
-  board: CellState[][];
-  // Focused cell.
-  focus: Point;
 };
