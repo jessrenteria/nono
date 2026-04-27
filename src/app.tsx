@@ -17,5 +17,3 @@ export default function App() {
     </MemoryRouter>
   );
 }
-
-render(<App />);
