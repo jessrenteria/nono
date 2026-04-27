@@ -321,7 +321,10 @@ export default function Puzzle({ puzzle }: Props) {
       </Box>
       <Box>
         {RowConstraintSection()}
-        {BoardSection()}
+        {isSolved
+          ? <Gradient name="teen">{BoardSection()}</Gradient>
+          : BoardSection()
+        }
       </Box>
       {InfoSection()}
     </Box>
