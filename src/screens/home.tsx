@@ -81,6 +81,10 @@ function PlayMenu({ onSelectedBack }: PlayMenuProps) {
           value: '10x10',
         },
         {
+          label: '15 x 15',
+          value: '15x15',
+        },
+        {
           label: '20 x 20',
           value: '20x20',
         },
@@ -96,6 +100,9 @@ function PlayMenu({ onSelectedBack }: PlayMenuProps) {
             break;
           case '10x10':
             navigate('/puzzle/random/10/10');
+            break;
+          case '15x15':
+            navigate('/puzzle/random/15/15');
             break;
           case '20x20':
             navigate('/puzzle/random/20/20');
