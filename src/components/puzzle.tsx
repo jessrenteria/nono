@@ -228,7 +228,9 @@ export default function Puzzle({ puzzle }: Props) {
   const InfoSection = () => {
     return (
       <Box borderStyle='round'>
-        <Text>{model.puzzle.numRows} x {model.puzzle.numColumns}</Text>
+        <Text>
+          {model.puzzle.numRows} x {model.puzzle.numColumns} ({model.puzzle.type})
+        </Text>
         <Spacer />
         <Text>&lt;F&gt; to fill, &lt;C&gt; to cross, &lt;S&gt; to clear.</Text>
       </Box>

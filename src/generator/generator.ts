@@ -8,6 +8,7 @@ export function genPuzzle(rows: number, columns: number): Puzzle {
     numColumns: columns,
     rowConstraints: getRowConstraints(solution),
     columnConstraints: getColumnConstraints(solution),
+    type: 'random',
   };
 }
 

@@ -17,6 +17,9 @@ export type Puzzle = {
   // A ragged tensor with n columns of varying length. Constraints are defined
   // top-to-bottom.
   columnConstraints: number[][];
+
+  // Type of puzzle, or more specifically, how it was created.
+  type: 'random';
 };
 
 // State of an individual cell.
