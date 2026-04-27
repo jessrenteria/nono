@@ -11,7 +11,7 @@ export default function App() {
     <MemoryRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/puzzle" element={<Game />} />
+        <Route path="/puzzle/random/:rows/:columns" element={<Game />} />
         <Route path="/about" element={<About />} />
       </Routes>
     </MemoryRouter>
