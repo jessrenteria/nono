@@ -225,7 +225,7 @@ export default function Puzzle({ puzzle }: Props) {
     const formatCellState = (state: CellState) => {
       switch (state) {
         case 'empty': return '  ';
-        case 'crossed': return '╳╳';
+        case 'crossed': return isSolved ? '  ' : '╳╳';
         case 'filled': return '██';
       }
     };
