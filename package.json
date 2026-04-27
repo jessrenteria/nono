@@ -24,6 +24,7 @@
     "meow": "^11.0.0",
     "react": "^19.2.5",
     "react-router": "^7.14.2",
+    "react-timer-hook": "^4.0.5",
     "use-immer": "^0.11.0"
   },
   "devDependencies": {

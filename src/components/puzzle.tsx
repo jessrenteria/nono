@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { useNavigate } from 'react-router';
 import { Box, Spacer, Text, useInput } from 'ink';
 import Gradient from 'ink-gradient';
 import { useImmer } from 'use-immer';
+import { useNavigate } from 'react-router';
+import { useStopwatch } from 'react-timer-hook';
 
 import { type CellState, type Model, type Puzzle } from '@/model';
 
@@ -31,6 +32,18 @@ export default function Puzzle({ puzzle }: Props) {
   const [model, updateModel] = useImmer<Model>(initModel(puzzle));
   const [solutionState, updateSolutionState] =
     useImmer<SolutionState>(initSolutionState(puzzle));
+  const {
+    totalSeconds,
+    milliseconds,
+    seconds,
+    minutes,
+    hours,
+    days,
+    isRunning,
+    start,
+    pause,
+    reset,
+  } = useStopwatch({ autoStart: true });
 
   const getFocusState = () => {
     return model.board[model.focus.row]![model.focus.column]!;
@@ -42,6 +55,10 @@ export default function Puzzle({ puzzle }: Props) {
 
   const isSolved = solutionState.falseFills === 0 &&
     solutionState.trueFills === solutionState.solutionFills;
+
+  if (isSolved && isRunning) {
+    pause();
+  }
 
   useInput((input, key) => {
     if (key.return) {
@@ -304,10 +321,13 @@ export default function Puzzle({ puzzle }: Props) {
       <Box gap={1} borderStyle='round'>
         <Text>{model.puzzle.numRows} x {model.puzzle.numColumns}</Text>
         <Text>({model.puzzle.type})</Text>
+        <Text>{formatTime(hours, minutes, seconds)}</Text>
         <Spacer />
         {isSolved && <Gradient name="teen"><Text>C L E A R !</Text></Gradient>}
         <Spacer />
-        <Text>&lt;F&gt; to fill, &lt;C&gt; to cross, &lt;S&gt; to clear,</Text>
+        <Text>&lt;F&gt; to fill</Text>
+        <Text>&lt;C&gt; to cross</Text>
+        <Text>&lt;S&gt; to clear</Text>
         <Text>&lt;Enter&gt; for main menu</Text>
       </Box>
     );
@@ -356,4 +376,13 @@ function initModel(puzzle: Puzzle): Model {
 
 function getEmptyBoard(rows: number, columns: number): CellState[][] {
   return Array.from({ length: rows }, () => Array(columns).fill('empty'));
+}
+
+function padTo2(n: number) {
+  let s = n.toString();
+  return s.length == 1 ? '0' + s : s;
+}
+
+function formatTime(hours: number, minutes: number, seconds: number): string {
+  return padTo2(hours) + ':' + padTo2(minutes) + ':' + padTo2(seconds);
 }
