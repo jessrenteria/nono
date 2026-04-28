@@ -6,26 +6,40 @@ import Gradient from 'ink-gradient';
 import SelectInput from 'ink-select-input';
 import { useNavigate } from 'react-router';
 
+type Menu =
+  | 'home'
+  | 'play'
+  | 'create';
+
 export default function Home() {
-  const [hasSelectedPlay, setHasSelectedPlay] = useState<boolean>(false);
+  const [menu, setMenu] = useState<Menu>('home');
+
+  const menuComponent = (() => {
+    switch (menu) {
+      case 'play':
+        return <PlayMenu setMenu={setMenu} />;
+      case 'create':
+        return <CreateMenu setMenu={setMenu} />;
+      default:
+        return <MainMenu setMenu={setMenu} />;
+    }
+  })();
 
   return (
     <Box margin={2} gap={1} flexDirection="column">
       <Gradient name="teen">
         <BigText text="nono" />
       </Gradient>
-      {hasSelectedPlay
-        ? <PlayMenu onSelectedBack={() => setHasSelectedPlay(false)} />
-        : <MainMenu onSelectedPlay={() => setHasSelectedPlay(true)} />}
+      {menuComponent}
     </Box>
   );
 }
 
-type MainMenuProps = {
-  onSelectedPlay: () => void;
-};
+type MenuProps = {
+  setMenu: (menu: Menu) => void;
+}
 
-function MainMenu({ onSelectedPlay }: MainMenuProps) {
+function MainMenu({ setMenu }: MenuProps) {
   const navigate = useNavigate();
   const { exit } = useApp();
 
@@ -35,6 +49,10 @@ function MainMenu({ onSelectedPlay }: MainMenuProps) {
         {
           label: 'Play',
           value: 'play',
+        },
+        {
+          label: 'Create',
+          value: 'create',
         },
         {
           label: 'About',
@@ -48,7 +66,10 @@ function MainMenu({ onSelectedPlay }: MainMenuProps) {
       onSelect={({ label, value }) => {
         switch (value) {
           case 'play':
-            onSelectedPlay();
+            setMenu('play');
+            break;
+          case 'create':
+            setMenu('create');
             break;
           case 'about':
             navigate('/about');
@@ -62,11 +83,7 @@ function MainMenu({ onSelectedPlay }: MainMenuProps) {
   );
 }
 
-type PlayMenuProps = {
-  onSelectedBack: () => void;
-};
-
-function PlayMenu({ onSelectedBack }: PlayMenuProps) {
+function PlayMenu({ setMenu }: MenuProps) {
   const navigate = useNavigate();
 
   return (
@@ -108,7 +125,57 @@ function PlayMenu({ onSelectedBack }: PlayMenuProps) {
             navigate('/puzzle/random/20/20');
             break;
           case 'back':
-            onSelectedBack();
+            setMenu('home');
+            break;
+        }
+      }}
+    />
+  );
+}
+
+function CreateMenu({ setMenu }: MenuProps) {
+  const navigate = useNavigate();
+
+  return (
+    <SelectInput
+      items={[
+        {
+          label: '5 x 5',
+          value: '5x5',
+        },
+        {
+          label: '10 x 10',
+          value: '10x10',
+        },
+        {
+          label: '15 x 15',
+          value: '15x15',
+        },
+        {
+          label: '20 x 20',
+          value: '20x20',
+        },
+        {
+          label: 'Back',
+          value: 'back',
+        },
+      ]}
+      onSelect={({ label, value }) => {
+        switch (value) {
+          case '5x5':
+            navigate('/edit/5/5');
+            break;
+          case '10x10':
+            navigate('/edit/10/10');
+            break;
+          case '15x15':
+            navigate('/edit/15/15');
+            break;
+          case '20x20':
+            navigate('/edit/20/20');
+            break;
+          case 'back':
+            setMenu('home');
             break;
         }
       }}

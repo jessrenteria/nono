@@ -12,6 +12,16 @@ export function genPuzzle(rows: number, columns: number): PuzzleData {
   };
 }
 
+export function getRowConstraints(solution: boolean[][]): number[][] {
+  return solution.map(getConstraints);
+}
+
+export function getColumnConstraints(solution: boolean[][]): number[][] {
+  // TODO: Consider avoiding the transpose while minimizing code duplication
+  // by using generators instead of arrays.
+  return transposeMatrix(solution).map(getConstraints);
+}
+
 // Returns a uniform distribution of {true, false}.
 function coinFlip() {
   return Math.random() >= 0.5;
@@ -50,10 +60,6 @@ function getConstraints(line: boolean[]): number[] {
   return constraints;
 }
 
-function getRowConstraints(solution: boolean[][]): number[][] {
-  return solution.map(getConstraints);
-}
-
 // Transposes a dense m x n matrix into an n x m matrix.
 function transposeMatrix<T>(matrix: T[][]): T[][] {
   if (matrix.length === 0) return [];
@@ -70,10 +76,4 @@ function transposeMatrix<T>(matrix: T[][]): T[][] {
     rows.push(row);
   }
   return rows;
-}
-
-function getColumnConstraints(solution: boolean[][]): number[][] {
-  // TODO: Consider avoiding the transpose while minimizing code duplication
-  // by using generators instead of arrays.
-  return transposeMatrix(solution).map(getConstraints);
 }
