@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router';
 type Menu =
   | 'home'
   | 'play'
-  | 'create';
+  | 'create'
+  | 'random';
 
 export default function Home() {
   const [menu, setMenu] = useState<Menu>('home');
@@ -20,6 +21,8 @@ export default function Home() {
         return <PlayMenu setMenu={setMenu} />;
       case 'create':
         return <CreateMenu setMenu={setMenu} />;
+      case 'random':
+        return <RandomMenu setMenu={setMenu} />;
       default:
         return <MainMenu setMenu={setMenu} />;
     }
@@ -90,6 +93,42 @@ function PlayMenu({ setMenu }: MenuProps) {
     <SelectInput
       items={[
         {
+          label: 'Random',
+          value: 'random',
+        },
+        {
+          label: 'Custom',
+          value: 'custom',
+        },
+        {
+          label: 'Back',
+          value: 'back',
+        },
+      ]}
+      onSelect={({ label, value }) => {
+        switch (value) {
+          case 'random':
+            setMenu('random');
+            break;
+          case 'custom':
+            navigate('/puzzle/custom');
+            break;
+          case 'back':
+            setMenu('home');
+            break;
+        }
+      }}
+    />
+  );
+}
+
+function RandomMenu({ setMenu }: MenuProps) {
+  const navigate = useNavigate();
+
+  return (
+    <SelectInput
+      items={[
+        {
           label: '5 x 5',
           value: '5x5',
         },
@@ -125,7 +164,7 @@ function PlayMenu({ setMenu }: MenuProps) {
             navigate('/puzzle/random/20/20');
             break;
           case 'back':
-            setMenu('home');
+            setMenu('play');
             break;
         }
       }}

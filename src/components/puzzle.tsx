@@ -9,13 +9,10 @@ import { useStopwatch } from 'react-timer-hook';
 import Board, {
   getEmptyBoard,
   type BoardProps,
-  type CellState,
-  type Point,
 } from '@/components/board';
 import { type PuzzleData } from '@/puzzle-data';
 
 const focusTextColor = '#e486ae';
-const focusBgColor = '#77a3d3';
 
 // State for efficiently checking completion status.
 type SolutionState = {
@@ -31,7 +28,7 @@ type SolutionState = {
 
 type Props = {
   puzzle: PuzzleData;
-  onNewPuzzle: () => void;
+  onNewPuzzle?: () => void;
 };
 
 export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
@@ -60,6 +57,8 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
     return boardProps.puzzle.solution[boardProps.focus.row]![boardProps.focus.column]!;
   };
 
+  const isRefreshable = onNewPuzzle !== undefined;
+
   // Find a cleaner way of handling isSolved toggle-triggered updates.
   // This should ideally just update the boardProps in the same pass.
   const isSolved = solutionState.falseFills === 0 &&
@@ -79,7 +78,7 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
       return;
     }
 
-    if (isSolved) {
+    if (isSolved && isRefreshable) {
       if (input === 'n') onNewPuzzle();
       return;
     }
@@ -266,7 +265,7 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
     if (isSolved) {
       return (
         <>
-          <Text>&lt;N&gt; to refresh board</Text>
+          {isRefreshable && <Text>&lt;N&gt; to refresh board</Text>}
           <Text>&lt;Enter&gt; for main menu</Text>
         </>
       );

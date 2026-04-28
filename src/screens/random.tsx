@@ -6,7 +6,7 @@ import Puzzle from '@/components/puzzle';
 import { genPuzzle } from '@/generator/generator';
 import { type PuzzleData } from '@/puzzle-data';
 
-export default function Game() {
+export default function Random() {
   let params = useParams();
 
   const [puzzle, setPuzzle] =
