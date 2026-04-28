@@ -100,16 +100,7 @@ export default function PuzzleData({ numRows, numColumns, onWrite }: Props) {
 
     // Save.
     if (input === 'w') {
-      const solution: boolean[][] = getSolutionFromFills(boardProps.board);
-      const puzzle: PuzzleData = {
-        solution: solution,
-        numRows: numRows,
-        numColumns: numColumns,
-        rowConstraints: getRowConstraints(solution),
-        columnConstraints: getColumnConstraints(solution),
-        type: 'custom',
-      };
-      onWrite(puzzle);
+      onWrite(getPuzzleFromFills(boardProps));
       setJustWritten(true);
       updateBoardProps((boardProps) => { boardProps.isSolved = true });
       setTimeout(
@@ -181,4 +172,16 @@ function initBoardProps(numRows: number, numColumns: number): BoardProps {
 
 function getSolutionFromFills(board: CellState[][]): boolean[][] {
   return board.map(row => row.map(cell => cell === 'filled'));
+}
+
+function getPuzzleFromFills(boardProps: BoardProps): PuzzleData {
+  const solution: boolean[][] = getSolutionFromFills(boardProps.board);
+  return {
+    solution: solution,
+    numRows: boardProps.puzzle.numRows,
+    numColumns: boardProps.puzzle.numColumns,
+    rowConstraints: getRowConstraints(solution),
+    columnConstraints: getColumnConstraints(solution),
+    type: 'custom',
+  };
 }
