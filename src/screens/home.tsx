@@ -6,11 +6,14 @@ import Gradient from 'ink-gradient';
 import SelectInput from 'ink-select-input';
 import { useNavigate } from 'react-router';
 
+import levels5x5 from "@/data/levels/5x5.json";
+
 type Menu =
   | 'home'
   | 'play'
   | 'create'
-  | 'random';
+  | 'random'
+  | 'levels';
 
 export default function Home() {
   const [menu, setMenu] = useState<Menu>('home');
@@ -23,6 +26,8 @@ export default function Home() {
         return <CreateMenu setMenu={setMenu} />;
       case 'random':
         return <RandomMenu setMenu={setMenu} />;
+      case 'levels':
+        return <LevelsMenu setMenu={setMenu} />;
       default:
         return <MainMenu setMenu={setMenu} />;
     }
@@ -97,6 +102,10 @@ function PlayMenu({ setMenu }: MenuProps) {
           value: 'random',
         },
         {
+          label: 'Levels',
+          value: 'levels',
+        },
+        {
           label: 'Custom',
           value: 'custom',
         },
@@ -109,6 +118,9 @@ function PlayMenu({ setMenu }: MenuProps) {
         switch (value) {
           case 'random':
             setMenu('random');
+            break;
+          case 'levels':
+            setMenu('levels');
             break;
           case 'custom':
             navigate('/puzzle/custom');
@@ -165,6 +177,79 @@ function RandomMenu({ setMenu }: MenuProps) {
             break;
           case 'back':
             setMenu('play');
+            break;
+        }
+      }}
+    />
+  );
+}
+
+function LevelsMenu({ setMenu }: MenuProps) {
+  const navigate = useNavigate();
+  type Submenu = {
+    type: string
+    rows: number,
+    columns: number,
+  };
+  const [submenu, setSubmenu] = useState<Submenu | undefined>(undefined);
+
+  if (submenu === undefined) {
+    return (
+      <SelectInput
+        items={[
+          {
+            label: '5 x 5',
+            value: '5x5',
+          },
+          {
+            label: 'Back',
+            value: 'back',
+          },
+        ]}
+        onSelect={({ label, value }) => {
+          switch (value) {
+            case '5x5':
+              setSubmenu({ type: '5x5', rows: 5, columns: 5 });
+              break;
+            case 'back':
+              setMenu('play');
+              break;
+          }
+        }}
+      />
+    );
+  }
+
+  const numItems = (() => {
+    switch (submenu.type) {
+      case '5x5':
+        return levels5x5;
+      default:
+        return undefined;
+    }
+  })()?.puzzles.length;
+
+  let items = Array.from({ length: numItems! }, (_, i) => {
+    return {
+      label: (i + 1).toString(),
+      value: i.toString(),
+    }
+  });
+  items.push({ label: 'Back', value: 'back' });
+
+  return (
+    <SelectInput
+      items={items}
+      limit={5}
+      onSelect={({ label, value }) => {
+        switch (value) {
+          case 'back':
+            setMenu('play');
+            break;
+          default:
+            navigate(
+              '/puzzle/levels/' +
+              [submenu.rows, submenu.columns, value].join('/'));
             break;
         }
       }}

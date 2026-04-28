@@ -19,5 +19,5 @@ export type PuzzleData = {
   columnConstraints: number[][];
 
   // Type of puzzle, or more specifically, how it was created.
-  type: 'custom' | 'random';
+  type: 'custom' | 'levels' | 'random';
 };

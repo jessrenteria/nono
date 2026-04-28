@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Box, Text } from 'ink';
 import Gradient from 'ink-gradient';

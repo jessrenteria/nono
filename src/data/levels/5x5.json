@@ -1,0 +1,11 @@
+{
+  "puzzles": [
+    {"solution":[[false,true,false,true,false],[true,true,true,true,true],[false,true,false,true,false],[true,true,true,true,true],[false,true,false,true,false]],"numRows":5,"numColumns":5,"rowConstraints":[[1,1],[5],[1,1],[5],[1,1]],"columnConstraints":[[1,1],[5],[1,1],[5],[1,1]],"type":"levels"},
+    {"solution":[[false,false,true,false,false],[false,true,true,true,false],[false,false,true,false,false],[false,false,true,false,false],[false,false,true,false,false]],"numRows":5,"numColumns":5,"rowConstraints":[[1],[3],[1],[1],[1]],"columnConstraints":[[0],[1],[5],[1],[0]],"type":"levels"},
+    {"solution":[[false,true,true,true,false],[true,false,false,false,true],[true,true,true,true,true],[true,false,false,false,true],[true,false,false,false,true]],"numRows":5,"numColumns":5,"rowConstraints":[[3],[1,1],[5],[1,1],[1,1]],"columnConstraints":[[4],[1,1],[1,1],[1,1],[4]],"type":"levels"},
+    {"solution":[[true,true,true,true,false],[true,false,false,false,true],[true,true,true,true,false],[true,false,false,false,true],[true,true,true,true,false]],"numRows":5,"numColumns":5,"rowConstraints":[[4],[1,1],[4],[1,1],[4]],"columnConstraints":[[5],[1,1,1],[1,1,1],[1,1,1],[1,1]],"type":"levels"},
+    {"solution":[[false,true,true,true,false],[true,false,false,false,true],[true,false,false,false,false],[true,false,false,false,true],[false,true,true,true,false]],"numRows":5,"numColumns":5,"rowConstraints":[[3],[1,1],[1],[1,1],[3]],"columnConstraints":[[3],[1,1],[1,1],[1,1],[1,1]],"type":"levels"},
+    {"solution":[[true,true,true,true,true],[false,false,false,true,false],[false,false,true,false,false],[false,true,false,false,false],[true,true,true,true,true]],"numRows":5,"numColumns":5,"rowConstraints":[[5],[1],[1],[1],[5]],"columnConstraints":[[1,1],[1,2],[1,1,1],[2,1],[1,1]],"type":"levels"},
+    {"solution":[[false,false,false,false,false],[false,true,false,true,false],[false,false,false,false,false],[true,false,false,false,true],[false,true,true,true,false]],"numRows":5,"numColumns":5,"rowConstraints":[[0],[1,1],[0],[1,1],[3]],"columnConstraints":[[1],[1,1],[1],[1,1],[1]],"type":"levels"}
+  ]
+}
