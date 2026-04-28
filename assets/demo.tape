@@ -72,7 +72,7 @@ Set Height 1000
 Type "nono" Sleep 500ms Enter
 Sleep 500ms
 # Main menu
-Set TypingSpeed 300ms
+Set TypingSpeed 500ms
 Down 4 Enter
 # Play menu
 Down Enter
