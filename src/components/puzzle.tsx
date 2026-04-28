@@ -6,6 +6,12 @@ import { useImmer } from 'use-immer';
 import { useNavigate } from 'react-router';
 import { useStopwatch } from 'react-timer-hook';
 
+import Board, {
+  getEmptyBoard,
+  type BoardProps,
+  type CellState,
+  type Point,
+} from '@/components/board';
 import { type PuzzleData } from '@/puzzle-data';
 
 const focusTextColor = '#e486ae';
@@ -23,27 +29,6 @@ type SolutionState = {
   falseFills: number,
 };
 
-type CellState =
-  | 'empty'
-  | 'crossed'
-  | 'filled';
-
-// The top left corner is (0, 0).
-type Point = {
-  row: number;
-  column: number;
-};
-
-// Model for an m x n nonogram puzzle.
-type Model = {
-  // An m x n nonogram puzzle.
-  puzzle: PuzzleData;
-  // An m x n tensor of the current cell states.
-  board: CellState[][];
-  // Focused cell.
-  focus: Point;
-};
-
 type Props = {
   puzzle: PuzzleData;
   onNewPuzzle: () => void;
@@ -51,7 +36,7 @@ type Props = {
 
 export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   const navigate = useNavigate();
-  const [model, updateModel] = useImmer<Model>(initModel(puzzle));
+  const [boardProps, updateBoardProps] = useImmer<BoardProps>(initBoardProps(puzzle));
   const [solutionState, updateSolutionState] =
     useImmer<SolutionState>(initSolutionState(puzzle));
   const {
@@ -68,18 +53,24 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   } = useStopwatch({ autoStart: true });
 
   const getFocusState = () => {
-    return model.board[model.focus.row]![model.focus.column]!;
+    return boardProps.board[boardProps.focus.row]![boardProps.focus.column]!;
   };
 
   const getFocusSolution = () => {
-    return model.puzzle.solution[model.focus.row]![model.focus.column]!;
+    return boardProps.puzzle.solution[boardProps.focus.row]![boardProps.focus.column]!;
   };
 
+  // Find a cleaner way of handling isSolved toggle-triggered updates.
+  // This should ideally just update the boardProps in the same pass.
   const isSolved = solutionState.falseFills === 0 &&
     solutionState.trueFills === solutionState.solutionFills;
 
   if (isSolved && isRunning) {
     pause();
+  }
+
+  if (isSolved && !boardProps.isSolved) {
+    updateBoardProps((boardProps) => { boardProps.isSolved = true; });
   }
 
   useInput((input, key) => {
@@ -102,40 +93,40 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
     };
 
     if (key.leftArrow || input === 'h') {
-      updateModel((model) => {
-        model.focus.column =
-          wrappedDecrement(model.focus.column, model.puzzle.numColumns);
+      updateBoardProps((boardProps) => {
+        boardProps.focus.column =
+          wrappedDecrement(boardProps.focus.column, boardProps.puzzle.numColumns);
       });
       return;
     }
     if (key.downArrow || input === 'j') {
-      updateModel((model) => {
-        model.focus.row =
-          wrappedIncrement(model.focus.row, model.puzzle.numRows);
+      updateBoardProps((boardProps) => {
+        boardProps.focus.row =
+          wrappedIncrement(boardProps.focus.row, boardProps.puzzle.numRows);
       });
       return;
     }
     if (key.upArrow || input === 'k') {
-      updateModel((model) => {
-        model.focus.row =
-          wrappedDecrement(model.focus.row, model.puzzle.numRows);
+      updateBoardProps((boardProps) => {
+        boardProps.focus.row =
+          wrappedDecrement(boardProps.focus.row, boardProps.puzzle.numRows);
       });
       return;
     }
     if (key.rightArrow || input === 'l') {
-      updateModel((model) => {
-        model.focus.column =
-          wrappedIncrement(model.focus.column, model.puzzle.numColumns);
+      updateBoardProps((boardProps) => {
+        boardProps.focus.column =
+          wrappedIncrement(boardProps.focus.column, boardProps.puzzle.numColumns);
       });
       return;
     }
 
     // Fill.
     if (input === 'f') {
-      updateModel((model) => {
+      updateBoardProps((boardProps) => {
         const currentState = getFocusState();
         if (currentState === 'filled') {
-          model.board[model.focus.row]![model.focus.column]! = 'empty';
+          boardProps.board[boardProps.focus.row]![boardProps.focus.column]! = 'empty';
           if (getFocusSolution()) {
             updateSolutionState((solutionState) => {
               --solutionState.trueFills;
@@ -147,7 +138,7 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
           }
           return;
         }
-        model.board[model.focus.row]![model.focus.column]! = 'filled';
+        boardProps.board[boardProps.focus.row]![boardProps.focus.column]! = 'filled';
         if (getFocusSolution()) {
           updateSolutionState((solutionState) => {
             ++solutionState.trueFills;
@@ -163,13 +154,13 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
 
     // Cross.
     if (input === 'c') {
-      updateModel((model) => {
+      updateBoardProps((boardProps) => {
         const currentState = getFocusState();
         if (currentState === 'crossed') {
-          model.board[model.focus.row]![model.focus.column]! = 'empty';
+          boardProps.board[boardProps.focus.row]![boardProps.focus.column]! = 'empty';
           return;
         }
-        model.board[model.focus.row]![model.focus.column]! = 'crossed';
+        boardProps.board[boardProps.focus.row]![boardProps.focus.column]! = 'crossed';
         if (currentState === 'filled') {
           if (getFocusSolution()) {
             updateSolutionState((solutionState) => {
@@ -187,9 +178,9 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
 
     // Clear.
     if (input === 's') {
-      updateModel((model) => {
-        model.board[model.focus.row]![model.focus.column]! = 'empty';
+      updateBoardProps((boardProps) => {
         const currentState = getFocusState();
+        boardProps.board[boardProps.focus.row]![boardProps.focus.column]! = 'empty';
         if (currentState === 'filled') {
           if (getFocusSolution()) {
             updateSolutionState((solutionState) => {
@@ -207,7 +198,7 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   });
 
   const ColumnConstraints = (constraints: number[], column: number) => {
-    const shouldHighlight = !isSolved && column === model.focus.column;
+    const shouldHighlight = !isSolved && column === boardProps.focus.column;
     return (
       <Box width={3} flexDirection="column" alignItems="flex-end" key={column}>
         {constraints.map(
@@ -225,13 +216,13 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   const ColumnConstraintSection = () => {
     return (
       <Box flexDirection="row" alignItems="flex-end">
-        {model.puzzle.columnConstraints.map(ColumnConstraints)}
+        {boardProps.puzzle.columnConstraints.map(ColumnConstraints)}
       </Box>
     );
   };
 
   const RowConstraints = (constraints: number[], row: number) => {
-    const shouldHighlight = !isSolved && row === model.focus.row;
+    const shouldHighlight = !isSolved && row === boardProps.focus.row;
     return (
       <Box
         height={2}
@@ -254,14 +245,14 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   const RowConstraintSection = () => {
     return (
       <Box flexDirection="column" alignItems="flex-end">
-        {model.puzzle.rowConstraints.map(RowConstraints)}
+        {boardProps.puzzle.rowConstraints.map(RowConstraints)}
       </Box>
     );
   };
 
   const BoardSection = () => {
-    const numRows = model.puzzle.numRows;
-    const numColumns = model.puzzle.numColumns;
+    const numRows = boardProps.puzzle.numRows;
+    const numColumns = boardProps.puzzle.numColumns;
 
     const formatCellState = (state: CellState) => {
       switch (state) {
@@ -273,12 +264,12 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
 
     const createDataRow = (left: string, rowIndex: number, junction: string,
       junction5: string, right: string) => {
-      const states = model.board[rowIndex]!;
+      const states = boardProps.board[rowIndex]!;
       let id = 0;
       let row = [<Text key={id++}>{left}</Text>];
       for (let c = 0; c < states.length; ++c) {
-        let shouldHighlight = !isSolved && rowIndex === model.focus.row
-          && c === model.focus.column;
+        let shouldHighlight = !isSolved && rowIndex === boardProps.focus.row
+          && c === boardProps.focus.column;
         let backgroundColor = (shouldHighlight && states[c]! == 'empty')
           ? focusBgColor : '';
         row.push(
@@ -329,8 +320,8 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   }
 
   const SpacerSection = () => {
-    const rowConstraints = model.puzzle.rowConstraints;
-    const columnConstraints = model.puzzle.columnConstraints;
+    const rowConstraints = boardProps.puzzle.rowConstraints;
+    const columnConstraints = boardProps.puzzle.columnConstraints;
 
     const width = Math.max(...rowConstraints.map(
       row => row.length - 1 + row.reduce(
@@ -363,8 +354,8 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
   const InfoSection = () => {
     return (
       <Box gap={1} borderStyle='round'>
-        <Text>{model.puzzle.numRows} x {model.puzzle.numColumns}</Text>
-        <Text>({model.puzzle.type})</Text>
+        <Text>{boardProps.puzzle.numRows} x {boardProps.puzzle.numColumns}</Text>
+        <Text>({boardProps.puzzle.type})</Text>
         <Text>{formatTime(hours, minutes, seconds)}</Text>
         <Spacer />
         {isSolved && <Gradient name="teen"><Text>C L E A R !</Text></Gradient>}
@@ -382,10 +373,7 @@ export default function PuzzleData({ puzzle, onNewPuzzle }: Props) {
       </Box>
       <Box>
         {RowConstraintSection()}
-        {isSolved
-          ? <Gradient name="teen">{BoardSection()}</Gradient>
-          : BoardSection()
-        }
+        <Board {...boardProps} />
       </Box>
       {InfoSection()}
     </Box>
@@ -407,16 +395,14 @@ function initSolutionState(puzzle: PuzzleData) {
   };
 }
 
-function initModel(puzzle: PuzzleData): Model {
+// Initialize empty BoardProps for the given puzzle.
+function initBoardProps(puzzle: PuzzleData): BoardProps {
   return {
     puzzle: puzzle,
     board: getEmptyBoard(puzzle.numRows, puzzle.numColumns),
     focus: { row: 0, column: 0 },
+    isSolved: false,
   };
-}
-
-function getEmptyBoard(rows: number, columns: number): CellState[][] {
-  return Array.from({ length: rows }, () => Array(columns).fill('empty'));
 }
 
 function padTo2(n: number) {
