@@ -67,15 +67,16 @@ Set WindowBar Colorful
 Set Theme GruvboxDark
 Set FontSize 24
 Set Width 1500
-Set Height 800
+Set Height 1000
 
 Type "nono" Sleep 500ms Enter
 Sleep 500ms
 # Main menu
-Set TypingSpeed 200ms
-Down 3 Enter
+Set TypingSpeed 300ms
+Down 4 Enter
 # Play menu
-Sleep 500ms Enter
-# Game
-Type "jjjjjfjlfjlcjlfjlfjfhjfhjhjfhjf"
+Down Enter
+# Custom
+Set TypingSpeed 50ms
+Type "jjjjfkfkfkfkfjlfjlfjlfjlfkfkfkfkfllflflfljfjfjfjhfhfhfhkfkfkfkklflflflkfkfkfkhfhfhfhjfjfjfkkkhfjfjfjfjfhkfhkfhkfhkfjfjfjfjf"
 Sleep 2s
