@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 
 import { Box, Spacer, Text, useInput } from 'ink';
 import Gradient from 'ink-gradient';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
@@ -19,9 +16,10 @@ import { type PuzzleData } from '@/puzzle-data';
 type Props = {
   numRows: number,
   numColumns: number,
+  onWrite: (puzzle: PuzzleData) => void;
 };
 
-export default function PuzzleData({ numRows, numColumns }: Props) {
+export default function PuzzleData({ numRows, numColumns, onWrite }: Props) {
   const navigate = useNavigate();
   const [boardProps, updateBoardProps] =
     useImmer<BoardProps>(initBoardProps(numRows, numColumns));
@@ -30,29 +28,6 @@ export default function PuzzleData({ numRows, numColumns }: Props) {
   const getFocusState = () => {
     return boardProps.board[boardProps.focus.row]![boardProps.focus.column]!;
   };
-
-  const writePuzzle = () => {
-    const solution: boolean[][] = getSolutionFromFills(boardProps.board);
-    const puzzle: PuzzleData = {
-      solution: solution,
-      numRows: numRows,
-      numColumns: numColumns,
-      rowConstraints: getRowConstraints(solution),
-      columnConstraints: getColumnConstraints(solution),
-      type: 'custom',
-    };
-
-    fs.mkdir(
-      path.join(os.homedir(), '.nono'),
-      { recursive: true },
-      (err) => {
-        if (err) throw err;
-        Bun.write(
-          path.join(
-            os.homedir(), '.nono', 'levels', 'custom', 'singleton.json'),
-          JSON.stringify(puzzle));
-      });
-  }
 
   useInput((input, key) => {
     if (key.return) {
@@ -125,7 +100,16 @@ export default function PuzzleData({ numRows, numColumns }: Props) {
 
     // Save.
     if (input === 'w') {
-      writePuzzle();
+      const solution: boolean[][] = getSolutionFromFills(boardProps.board);
+      const puzzle: PuzzleData = {
+        solution: solution,
+        numRows: numRows,
+        numColumns: numColumns,
+        rowConstraints: getRowConstraints(solution),
+        columnConstraints: getColumnConstraints(solution),
+        type: 'custom',
+      };
+      onWrite(puzzle);
       setJustWritten(true);
       updateBoardProps((boardProps) => { boardProps.isSolved = true });
       setTimeout(
