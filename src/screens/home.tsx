@@ -6,7 +6,7 @@ import Gradient from 'ink-gradient';
 import SelectInput from 'ink-select-input';
 import { useNavigate } from 'react-router';
 
-import levels5x5 from "@/data/levels/5x5.json";
+import { getLevelSet } from "@/levels";
 
 type Menu =
   | 'home'
@@ -220,14 +220,8 @@ function LevelsMenu({ setMenu }: MenuProps) {
     );
   }
 
-  const numItems = (() => {
-    switch (submenu.type) {
-      case '5x5':
-        return levels5x5;
-      default:
-        return undefined;
-    }
-  })()?.puzzles.length;
+  const numItems =
+    getLevelSet({ type: 'string', levelSet: submenu.type })?.length;
 
   let items = Array.from({ length: numItems! }, (_, i) => {
     return {

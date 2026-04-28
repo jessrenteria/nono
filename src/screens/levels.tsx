@@ -6,9 +6,8 @@ import Spinner from 'ink-spinner';
 import { useNavigate, useParams } from 'react-router';
 import { useImmer } from 'use-immer';
 
-import levels5x5 from "@/data/levels/5x5.json";
-
 import Puzzle from '@/components/puzzle';
+import { getLevelSet } from '@/levels';
 import { type PuzzleData } from '@/puzzle-data';
 
 const focusBgColor = '#77a3d3';
@@ -45,7 +44,7 @@ export default function Levels() {
   }
 
   const handleNewPuzzle = () => {
-    const numPuzzles = getLevelList(levelSelection)!.length;
+    const numPuzzles = getLevelSetForSelection(levelSelection)!.length;
     if (levelSelection.index === numPuzzles - 1) {
       setHasFinishedLevels(true);
       setTimeout(() => {
@@ -65,16 +64,17 @@ export default function Levels() {
     : <Failed />;
 }
 
-function getLevelList(levelSelection: LevelSelection)
+function getLevelSetForSelection(levelSelection: LevelSelection)
   : PuzzleData[] | undefined {
-  if (levelSelection.rows === 5 && levelSelection.columns === 5) {
-    return levels5x5.puzzles as PuzzleData[];
-  }
-  return undefined;
+  return getLevelSet({
+    type: 'dims',
+    rows: levelSelection.rows,
+    columns: levelSelection.columns,
+  });
 }
 
 function getPuzzle(levelSelection: LevelSelection): PuzzleData | undefined {
-  return getLevelList(levelSelection)?.at(levelSelection.index);
+  return getLevelSetForSelection(levelSelection)?.at(levelSelection.index);
 }
 
 function EndOfLevels() {
