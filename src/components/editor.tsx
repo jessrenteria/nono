@@ -91,7 +91,6 @@ export default function PuzzleData({ numRows, numColumns, onWrite }: Props) {
     // Clear.
     if (input === 's') {
       updateBoardProps((boardProps) => {
-        const currentState = getFocusState();
         boardProps.board[boardProps.focus.row]![boardProps.focus.column]! =
           'empty';
       });
