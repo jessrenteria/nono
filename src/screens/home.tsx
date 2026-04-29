@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router';
 
 import { getLevelSet } from "@/levels";
 
+// Enforce a static height across all submenus to prevent incremental rendering
+// issues.
+const menuHeight = 5;
+
 type Menu =
   | 'home'
   | 'play'
@@ -38,7 +42,9 @@ export default function Home() {
       <Gradient name="teen">
         <BigText text="nono" />
       </Gradient>
-      {menuComponent}
+      <Box height={menuHeight}>
+        {menuComponent}
+      </Box>
     </Box>
   );
 }
@@ -53,6 +59,7 @@ function MainMenu({ setMenu }: MenuProps) {
 
   return (
     <SelectInput
+      limit={menuHeight}
       items={[
         {
           label: 'Play',
@@ -96,6 +103,7 @@ function PlayMenu({ setMenu }: MenuProps) {
 
   return (
     <SelectInput
+      limit={menuHeight}
       items={[
         {
           label: 'Random',
@@ -139,6 +147,7 @@ function RandomMenu({ setMenu }: MenuProps) {
 
   return (
     <SelectInput
+      limit={menuHeight}
       items={[
         {
           label: '5 x 5',
@@ -196,6 +205,7 @@ function LevelsMenu({ setMenu }: MenuProps) {
   if (submenu === undefined) {
     return (
       <SelectInput
+        limit={menuHeight}
         items={[
           {
             label: '5 x 5',
@@ -233,8 +243,8 @@ function LevelsMenu({ setMenu }: MenuProps) {
 
   return (
     <SelectInput
+      limit={menuHeight}
       items={items}
-      limit={5}
       onSelect={({ label, value }) => {
         switch (value) {
           case 'back':
@@ -256,6 +266,7 @@ function CreateMenu({ setMenu }: MenuProps) {
 
   return (
     <SelectInput
+      limit={menuHeight}
       items={[
         {
           label: '5 x 5',
