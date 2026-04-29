@@ -3,4 +3,4 @@ import React from 'react';
 import { render } from 'ink';
 import App from '@/app';
 
-render(<App />, { alternateScreen: true });
+render(<App />, { alternateScreen: true, incrementalRendering: true });
