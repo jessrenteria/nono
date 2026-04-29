@@ -1,6 +1,6 @@
 {
   "name": "@jessrenteria/nono",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A nonogram / picross TUI built with Ink",
   "license": "MIT",
   "repository": "jessrenteria/nono",
