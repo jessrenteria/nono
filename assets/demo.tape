@@ -75,7 +75,7 @@ Sleep 500ms
 Set TypingSpeed 500ms
 Down 4 Enter
 # Play menu
-Down Enter
+Down 2 Enter
 # Custom
 Set TypingSpeed 50ms
 Type "jjjjfkfkfkfkfjlfjlfjlfjlfkfkfkfkfllflflfljfjfjfjhfhfhfhkfkfkfkklflflflkfkfkfkhfhfhfhjfjfjfkkkhfjfjfjfjfhkfhkfhkfhkfjfjfjfjf"
